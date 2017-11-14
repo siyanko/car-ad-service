@@ -1,0 +1,2 @@
+GET        /               controllers.Application.index
+GET        /car-ads        controllers.Application.allCarAds
