@@ -1,2 +1,4 @@
-GET        /               controllers.Application.index
-GET        /car-ads        controllers.Application.allCarAds
+GET        /                        controllers.Application.index
+GET        /create-test-data        controllers.Application.fillTestData
+GET        /car-ads                 controllers.Application.allCarAds
+GET        /car-ads/:id             controllers.Application.getCarAd(id: String)

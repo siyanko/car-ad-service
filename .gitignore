@@ -14,5 +14,5 @@ src/main/public/javascripts/*min.js
 src/main/public/stylesheets/*min.css
 src/main/public/stylesheets/*min.css.map
 src/main/public/images/*
-/dynamodb-local
 project/
+dynamoDb-local/

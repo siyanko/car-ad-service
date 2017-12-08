@@ -1,34 +1,46 @@
 package controllers
 
+import java.util.{Date, UUID}
 import javax.inject.Inject
 
-import play.api.libs.json.{JsValue, Json}
+import data.Dynamo
+import model._
 import play.api.mvc.{AbstractController, ControllerComponents}
 
-sealed trait InOut[A]
-case class PrintlnLine(line: String) extends InOut[Unit]
-case class AllCarAds(ls: List[String]) extends InOut[JsValue]
 
 class Application @Inject()(cc: ControllerComponents)
   extends AbstractController(cc) {
 
-  val carAds = List(
-    "Slavuta 2006",
-    "VW 2007",
-    "BMW 2008",
-    "Mercedes 2009"
-  )
+  import CarAd._
+  import Utils._
 
   def index() = Action {
-    Ok("Welcome to funcy car-ad-service")
+    Ok("Welcome to funcy car-advert-service")
+  }
+
+  def fillTestData() = Action {
+    val cars: List[CarAd] = List(
+      CarAd(UUID.randomUUID(), "BMW X1", Gasoline, 32000),
+      CarAd(UUID.randomUUID(), "VW Golf", Diesel, 5000, 213001, new Date()),
+      CarAd(UUID.randomUUID(), "VW Polo", Gasoline, 2500, 323012, new Date())
+    )
+
+    Dynamo.createCarAds(cars)
+
+    Ok("Test data have been created")
   }
 
 
   def allCarAds() = Action {
-    println("Log... getting all car ads from database...")
-    val json: JsValue = Json.toJson(carAds)
-    println(s"Log.... returning all car ads $json")
-    Ok(json)
+    Ok(Dynamo.retrieveCarAds.toJson)
   }
+
+  def getCarAd(id: String) = Action {
+    Dynamo.getCarAd(id) match {
+      case Some(car) => Ok(car.toJson)
+      case None => BadRequest(s"Could not find car advert with id: $id")
+    }
+  }
+
 
 }

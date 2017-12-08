@@ -8,8 +8,16 @@ enablePlugins(PlayScala)
 
 libraryDependencies ++= Seq (
   guice,
-  "org.scalaz" %% "scalaz-core" % "7.2.16",
-  "org.scalaz" %% "scalaz-effect" % "7.2.16",
-  "org.scalaz" %% "scalaz-concurrent" % "7.2.16"
+  "com.amazonaws" % "aws-java-sdk-dynamodb" % "1.11.243",
+  "com.typesafe.play" %% "play-json" % "2.6.0"
 )
+
+scalacOptions += "-Ypartial-unification"
+
+dynamoDBLocalDownloadDir := file("dynamoDb-local")
+
+startDynamoDBLocal in Test := (startDynamoDBLocal in Test).dependsOn(compile in Test).value
+test in Test := (test in Test).dependsOn(startDynamoDBLocal in Test).value
+testOnly in Test := (testOnly in Test).dependsOn(startDynamoDBLocal in Test).value
+testOptions in Test += (dynamoDBLocalTestCleanup in Test).value
     

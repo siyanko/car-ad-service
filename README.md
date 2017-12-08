@@ -2,8 +2,6 @@
 small project to play with functional design of a microservice.
 
 ## Problem Description
-Create a git repository (either local or public one on GitHub) that contains a RESTful web-service written in Scala. The service should allow users to place new car adverts and view, modify and delete existing car adverts.
-
 Car adverts should have the following fields:
 * **id** (_required_): **int** or **guid**, choose whatever is more convenient for you;
 * **title** (_required_): **string**, e.g. _"Audi A4 Avant"_;
