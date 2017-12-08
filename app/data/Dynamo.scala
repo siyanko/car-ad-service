@@ -20,14 +20,14 @@ object Dynamo {
 
   private val dynamoDB: DynamoDB = new DynamoDB(client)
 
-  private val tableName: String = "car-ads"
+  private lazy val tableName: String = "car-ads"
 
-  private val putItem: Item => PutItemOutcome = item =>
+  private lazy val putItem: Item => PutItemOutcome = item =>
     dynamoDB
       .getTable(tableName)
       .putItem(item)
 
-  private val createItem: CarAd => Item = _ match {
+  private lazy val createItem: CarAd => Item = _ match {
     case NewCar(id, title, fuel, price) =>
       new Item()
         .withPrimaryKey("Id", id.toString)
@@ -47,7 +47,7 @@ object Dynamo {
         .withNumber("first_registration", firstRegistration.getTime)
   }
 
-  private val createCarAd: Item => CarAd = item => item.getBoolean("new") match {
+  private lazy val createCarAd: Item => CarAd = item => item.getBoolean("new") match {
     case true =>
       CarAd(UUID.fromString(item.getString("Id")), item.getString("Title"), Fuel(item.getString("fuel")), item.getInt("Price"))
 
@@ -62,13 +62,12 @@ object Dynamo {
       )
   }
 
-  val createCarAds: List[CarAd] => Unit = list => list.foreach(createItem andThen putItem)
+  lazy val createCarAds: List[CarAd] => Unit = list => list.foreach(createItem andThen putItem)
 
   def retrieveCarAds: Array[CarAd] = dynamoDB.getTable(tableName).scan(new ScanSpec()).asScala.map(createCarAd).toArray
 
-  val getCarAd: String => Option[CarAd] = id => Option {
+  lazy val getCarAd: String => Option[CarAd] = id => Option {
     dynamoDB.getTable(tableName).getItem("Id", id)
   }.map(createCarAd)
-
 
 }
