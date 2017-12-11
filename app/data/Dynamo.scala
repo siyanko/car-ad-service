@@ -13,12 +13,12 @@ import scala.collection.JavaConverters._
 
 object Dynamo {
 
-  private val client: AmazonDynamoDB = AmazonDynamoDBClientBuilder
+  private lazy val client: AmazonDynamoDB = AmazonDynamoDBClientBuilder
     .standard()
     .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://localhost:8000", Regions.DEFAULT_REGION.getName))
     .build()
 
-  private val dynamoDB: DynamoDB = new DynamoDB(client)
+  private lazy val dynamoDB: DynamoDB = new DynamoDB(client)
 
   private lazy val tableName: String = "car-ads"
 
@@ -63,6 +63,8 @@ object Dynamo {
   }
 
   lazy val createCarAds: List[CarAd] => Unit = list => list.foreach(createItem andThen putItem)
+
+  lazy val addCarAd: CarAd => PutItemOutcome = createItem andThen putItem
 
   def retrieveCarAds: Array[CarAd] = dynamoDB.getTable(tableName).scan(new ScanSpec()).asScala.map(createCarAd).toArray
 

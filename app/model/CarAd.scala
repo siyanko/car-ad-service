@@ -5,14 +5,16 @@ import java.util.{Date, UUID}
 import model.CarAd._
 import play.api.libs.json.{JsValue, Json, Writes}
 
-sealed trait CarAd
+sealed trait CarAd {
+  def id: Id
+}
 
-case class NewCar(id: Id,
+case class NewCar(val id: Id,
                   title: Title,
                   fuel: Fuel,
                   price: Price) extends CarAd
 
-case class UsedCar(id: Id,
+case class UsedCar(val id: Id,
                    title: Title,
                    fuel: Fuel,
                    price: Price,

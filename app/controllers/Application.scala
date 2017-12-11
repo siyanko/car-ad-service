@@ -5,14 +5,18 @@ import javax.inject.Inject
 
 import data.Dynamo
 import model._
-import play.api.mvc.{AbstractController, ControllerComponents}
+import play.api.libs.json.JsValue
+import play.api.mvc._
+
+import scala.concurrent.ExecutionContext
 
 
-class Application @Inject()(cc: ControllerComponents)
+class Application @Inject()(cc: ControllerComponents)(implicit ec: ExecutionContext)
   extends AbstractController(cc) {
 
   import CarAd._
   import Utils._
+  import ApiActions._
 
   def index() = Action {
     Ok("Welcome to funcy car-advert-service")
@@ -38,9 +42,17 @@ class Application @Inject()(cc: ControllerComponents)
   def getCarAd(id: String) = Action {
     Dynamo.getCarAd(id) match {
       case Some(car) => Ok(car.toJson)
-      case None => BadRequest(s"Could not find car advert with id: $id")
+      case None => NotFound(s"Could not find car advert with id: $id")
     }
   }
 
+  def save = (CarAdAction(parse.tolerantJson) andThen validateAd) { req: CarAdRequest[JsValue] =>
+    toCarAd(req) match {
+      case Some(carAd) =>
+        Dynamo.addCarAd(carAd)
+        Ok(s"Your car has been successfully added with id: ${carAd.id}")
 
+      case None => BadRequest("Could not proceed the request")
+    }
+  }
 }
