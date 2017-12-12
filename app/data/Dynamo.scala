@@ -6,7 +6,8 @@ import com.amazonaws.client.builder.AwsClientBuilder
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec
 import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder}
-import com.amazonaws.services.dynamodbv2.document.{DynamoDB, Item, PutItemOutcome}
+import com.amazonaws.services.dynamodbv2.document.{DeleteItemOutcome, DynamoDB, Item, PutItemOutcome}
+import model.CarAd.Id
 import model.{CarAd, Fuel, NewCar, UsedCar}
 
 import scala.collection.JavaConverters._
@@ -71,5 +72,7 @@ object Dynamo {
   lazy val getCarAd: String => Option[CarAd] = id => Option {
     dynamoDB.getTable(tableName).getItem("Id", id)
   }.map(createCarAd)
+
+  lazy val deleteCarAd: Id => DeleteItemOutcome = id => dynamoDB.getTable(tableName).deleteItem("Id", id.toString)
 
 }

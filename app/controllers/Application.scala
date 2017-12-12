@@ -9,6 +9,7 @@ import play.api.libs.json.JsValue
 import play.api.mvc._
 
 import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success, Try}
 
 
 class Application @Inject()(cc: ControllerComponents)(implicit ec: ExecutionContext)
@@ -50,9 +51,19 @@ class Application @Inject()(cc: ControllerComponents)(implicit ec: ExecutionCont
     toCarAd(req) match {
       case Some(carAd) =>
         Dynamo.addCarAd(carAd)
-        Ok(s"Your car has been successfully added with id: ${carAd.id}")
+        Ok(s"Your car advert has been successfully added with id: ${carAd.id}")
 
       case None => BadRequest("Could not proceed the request")
+    }
+  }
+
+  def delete(id: String) = Action {
+    Try(UUID.fromString(id)) match {
+      case Success(uuid) =>
+        Dynamo.deleteCarAd(uuid)
+        Ok(s"Your car advert[id: $id] has been successfully deleted")
+
+      case Failure(_) => BadRequest(s"Wrong car ad id: $id")
     }
   }
 }
